@@ -28,35 +28,35 @@ struct ContentView: View {
     
     
     var body: some View {
-        if places.showMap {
+        if !showList {
             GeometryReader { proxy in
                 Map(coordinateRegion: $region,
                     interactionModes: [.all],
                     showsUserLocation: true,
                     userTrackingMode: .constant(.follow),
                     annotationItems: places.places) { place in
-                    MapMarker(coordinate: place.coordinate) //default map Marker
-//                    MapAnnotation(coordinate: place.coordinate, anchorPoint: CGPoint(x: 0.5, y: 0.5)) { // create own content on every map marker
-//                        VStack {
-//                            MapPinMarker(place: place)
-//                                .onTapGesture {
-//                                    isAddingName = true
-//                                }
-//                            if place.name == "" && isAddingName {
-//                                TextField("New place´s name", text: $addNewNamePlace, onCommit: {
-//                                    places.updateName(place: place, with: self.addNewNamePlace)
-//                                    isAddingName = false
-//                                }
-//
-//                                )
-//                                    .padding()
-//                                    .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
-//                                    .onAppear() {
-//                                        self.addNewNamePlace = ""
-//                                    }
-//                            }
-//                        }
-//                    }
+                   // MapMarker(coordinate: place.coordinate) //default map Marker
+                    MapAnnotation(coordinate: place.coordinate, anchorPoint: CGPoint(x: 0.5, y: 0.5)) { // create own content on every map marker
+                        VStack {
+                            MapPinMarker(place: place)
+                                .onTapGesture {
+                                    isAddingName = true
+                                }
+                            if place.name == "" && isAddingName {
+                                TextField("New place´s name", text: $addNewNamePlace, onCommit: {
+                                    places.updateName(place: place, with: self.addNewNamePlace)
+                                    isAddingName = false
+                                }
+
+                                )
+                                    .padding()
+                                    .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                                    .onAppear() {
+                                        self.addNewNamePlace = ""
+                                    }
+                            }
+                        }
+                    }
                 }
                     .gesture(LongPressGesture(
                         minimumDuration: 0.25)
@@ -75,9 +75,6 @@ struct ContentView: View {
                             })
                     .highPriorityGesture(DragGesture(minimumDistance: 10))
             }
-//            .onDisappear() {
-//                cleanupMap()
-//            }
             
             Button(action:  {
                 addPin()
@@ -85,51 +82,35 @@ struct ContentView: View {
                 Text("Add pin")
             }
         }
-//        else {
-//            List  {
-//            ForEach (places.places) { place in
-//                    HStack {
-//                        Text(place.name)
-//                        Text("\(place.longitude), \(place.latitude)")
-//                    }
-//                }
-//            }
-//        }
+        else {
+            List  {
+            ForEach (places.places) { place in
+                    HStack {
+                        Text(place.name)
+                        Text("\(place.longitude), \(place.latitude)")
+                    }
+                }
+            }
+        }
         
         Spacer()
         
-        Button(action: {
-            places.showMap = false
-            showMap = false
-            showList = true
-        }) {
-            ButtonContent(text: "List")
+        HStack {
+            Spacer()
+            Button(action: {
+                showList = false
+            }) {
+                ButtonContent(text: "Map")
+            }
+            Spacer()
+            Button(action: {
+                showList = true
+            }) {
+                ButtonContent(text: "List")
+            }
+            Spacer()
         }
-        .fullScreenCover(isPresented: $showList, content: ListOfPlacesView.init)
-//        HStack {
-//            Spacer()
-//            Button(action: {
-//                showList = false
-//            }) {
-//                ButtonContent(text: "Map")
-//            }
-//            Spacer()
-//            Button(action: {
-//                showList = true
-//            }) {
-//                ButtonContent(text: "List")
-//            }
-//            Spacer()
-//        }
     }
-    
-    func cleanupMap() {
-        // Step 1: Remove all references to the map
-        map.delegate = nil
-        map.removeFromSuperview()
-       // map = nil
-    }
-
     
     func addPlaceByTap (at point: CGPoint, for mapSize: CGSize) {
         let lat = region.center.latitude
@@ -158,26 +139,6 @@ struct ContentView: View {
             places.addPlace(place: newPlace)
             isAddingName = true
         }
-    }
-}
-
-private extension ContentView {
-    
-    func convertTap(at point: CGPoint, for mapSize: CGSize) -> Place {
-        let lat = region.center.latitude
-        let lon = region.center.longitude
-        
-        let mapCenter = CGPoint(x: mapSize.width/2, y: mapSize.height/2)
-        
-        // X
-        let xValue = (point.x - mapCenter.x) / mapCenter.x
-        let xSpan = xValue * region.span.longitudeDelta/2
-        
-        // Y
-        let yValue = (point.y - mapCenter.y) / mapCenter.y
-        let ySpan = yValue * region.span.latitudeDelta/2
-        
-        return Place(name: "", latitude: lat - ySpan, longitude: lon + xSpan)
     }
 }
 
