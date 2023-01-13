@@ -8,14 +8,19 @@
 import SwiftUI
 
 struct ContentView: View {
+    var locationManager = LocationManager()
     
     @State var showMap = true
     
+    init() {
+        locationManager.startLocationUpdates()
+    }
+    
     var body: some View {
         if showMap {
-            MapView()
+            MapView(locationManager: locationManager)
         } else {
-            ListOfPlacesView()
+            ListOfPlacesView(locationManager: locationManager)
         }
         Spacer()
         HStack {

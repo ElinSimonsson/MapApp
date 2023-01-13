@@ -6,12 +6,17 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct ListOfPlacesView: View {
     @EnvironmentObject var places : Places
+    //var locationManager = LocationManager()
+    var locationManager : LocationManager
     @State var selectedPlace : Place? = nil
     @State var newName = ""
     @FocusState var isFocused : Bool
+    @State var distance : Double = 0.0
+    
     
     var body: some View {
         List  {
@@ -32,15 +37,48 @@ struct ListOfPlacesView: View {
                     if selectedPlace != place {
                         Text(place.name)
                     }
-                    Text("\(place.longitude), \(place.latitude)")
+                    if place.kilometer {
+                        Text("\(place.distance) km")
+                    } else {
+                        Text("\(place.distance) meter")
+                    }
+                   
+                }
+                .onAppear() {
+                    calculateDistance()
                 }
                 .onTapGesture {
                     selectedPlace = place
                 }
             }
+            
             .onDelete() { indexSet in
                 places.deletePlace(indexSet: indexSet)
             }
+        }
+    }
+    
+    func calculateDistance () {
+        if let location = locationManager.location {
+            print("funktion addpin körs")
+            let currentLatitude = location.latitude
+            let currentLongitude = location.longitude
+            
+            for place in places.places {
+                let placeLocation = CLLocation(latitude: place.latitude, longitude: place.longitude)
+                let currentLocation = CLLocation(latitude: currentLatitude, longitude: currentLongitude)
+                var distance = currentLocation.distance(from: placeLocation)
+                if distance > 1000 {
+                    distance = distance / 1000 // get distance in kilometres
+                    places.updateisKilometers(place: place, with: true)
+                } else {
+                    places.updateisKilometers(place: place, with: false)
+                }
+                places.calculateDistance(place: place, with: distance)
+                print(place.distance, place.kilometer)
+            }
+            
+
         }
     }
 }

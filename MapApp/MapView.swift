@@ -9,23 +9,22 @@ import SwiftUI
 import MapKit
 
 struct MapView: View {
-    var locationManager = LocationManager()
+    //var locationManager = LocationManager()
+    var locationManager : LocationManager
     @EnvironmentObject var places : Places
     @State var map = MKMapView()
     @State var longPressLocation = CGPoint.zero
     @State var customPlace = Place(name: "", latitude: 0, longitude: 0)
     @State var addNewNamePlace = ""
     @State var isAddingName = true
-    
-
     @FocusState var isFocused : Bool
     
     @State var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 37.3323341, longitude: -122.0312186), span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02))
     
     
-    init() {
-        locationManager.startLocationUpdates()
-    }
+//    init() {
+//        locationManager.startLocationUpdates()
+//    }
     
     var body: some View {
         GeometryReader { proxy in

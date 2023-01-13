@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreLocation
 
 class Places : ObservableObject, Identifiable {
     var id = UUID()
@@ -35,6 +36,18 @@ class Places : ObservableObject, Identifiable {
     func updateName (place: Place, with name: String) {
         if let index = places.firstIndex(of: place) {
             places[index].name = name
+        }
+    }
+    
+    func calculateDistance (place: Place, with distance: Double) {
+        if let index = places.firstIndex(of: place) {
+            places[index].distance = distance
+        }
+    }
+    
+    func updateisKilometers (place: Place, with kilometer : Bool) {
+        if let index = places.firstIndex(of: place) {
+            places[index].kilometer = kilometer
         }
     }
 }
